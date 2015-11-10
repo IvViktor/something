@@ -2,13 +2,24 @@ package viktor.prog1;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.*;
+import java.io.IOException;
 public class MainFrame extends Frame implements ActionListener,ItemListener{
 	Checkbox sort,search;
+	TextField searchText;
+	Choice chmenu;
 	Panel searchPan;
+	java.util.Vector<Person> list;
 	String fileName=null;
+	ErrorDialog errD;
 	public static void main(String args[]){
+		SwingUtilities.invokeLater(new Runnable(){
+			public void run(){createGUI();}
+		});
+	}
+	private static void createGUI(){
 		MainFrame frame = new MainFrame();
-		frame.setSize(new Dimension(400,350));
+		frame.pack();
 		frame.setTitle("Учетник 2015");
 		frame.setVisible(true);
 	}
@@ -17,16 +28,40 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 		if(ae.getActionCommand().equals("browse")){
 		FileDialog fd = new FileDialog(this,"Выберите файл с информацией",FileDialog.LOAD);
 		fd.setVisible(true);
-		if(fd.getDirectory()!=null) fileName=fd.getDirectory()+fd.getFile();
-		else fileName = fd.getFile();
+	if((fd.getDirectory()!=null)&&(fd.getFile()!=null)){
+		fileName=fd.getDirectory()+fd.getFile();
+		try{
+			list=Person.getPersonsList(fileName);
+		} catch (IOException e){
+			String msg="Ошибка чтения файла: "+fileName;
+			errD=new ErrorDialog(this,"Ошибка ввода/вывода",true,msg);}
+		/* catch (IllegalArgumentException e){
+			String msg="Неправильный формат данных в файле: "+fileName;
+			errD=new ErrorDialog(this,"Ошибка чтения данных!!!",true,msg);}*/
+		}
 		}
 		if(ae.getActionCommand().equals("start")){
 			if(fileName==null){
 			String msg="Файл не найден, выберите файл с помощью кнопки <Выберите файл>";
-			ErrorDialog errD = new ErrorDialog(this,"ОШИБКА!",true,msg);
+			errD = new ErrorDialog(this,"ОШИБКА!",true,msg);
 			}
 			else{
-			ErrorDialog errD = new ErrorDialog(this,"Путь у файлу",true,fileName);
+			if(sort.getState()){
+				 list=Person.sort(list,chmenu.getSelectedIndex());
+				TableFrame table = new TableFrame("Список с допусками",list,getHeaders());
+			}
+			else if(search.getState()){
+				String pattern = searchText.getText();
+				if(pattern.length()==0){ 
+				errD=new ErrorDialog(this,"Ошыбка поиска",true,"Введите поисковый"+
+				" запрос в поле <Поиск>");
+				}
+				else{
+			Vector<Person> slist=Person.search(list,pattern,chmenu.getSelectedIndex());
+			TableFrame table = new TableFrame("Список с допусками",slist,getHeaders());
+				}
+			}
+			//for(int i=0;i<list.size();i++) System.out.println(list.get(i));
 			}
 		}
 	}
@@ -43,6 +78,7 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 		setLayout(gbag);
 		GridBagConstraints gbc = new GridBagConstraints();
 		Label head = new Label("Начните свою работу:",Label.CENTER);
+		head.setFont(new Font(Font.SERIF,Font.PLAIN,16));
 		gbc.insets= new Insets(5,5,5,5);
 		//gbc.fill=GridBagConstraints.BOTH;
 		//gbc.anchor=GridBagConstraints.PAGE_START;
@@ -58,7 +94,7 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 		search= new Checkbox("Поиск",grp,true);
 		gbc.gridx=3;
 		gbag.setConstraints(search,gbc);
-		Choice chmenu= new Choice();
+		chmenu= new Choice();
 		chmenu.add("по фамилии");chmenu.add("по номеру");
 		chmenu.add("по дате получения");chmenu.add("по дате истечения");
 		chmenu.select(3);
@@ -84,12 +120,27 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 		searchPan = new Panel();
 		Label searchLab= new Label("Поиск:",Label.CENTER);
 		searchPan.add(searchLab);
-		TextField searchText = new TextField(25);
+		searchText = new TextField(25);
 		searchPan.add(searchText);
 		gbc.gridx=0;gbc.gridy=2;gbc.gridwidth=4;
 		gbag.setConstraints(searchPan,gbc);
 		this.add(searchPan);
 		sort.addItemListener(this);
 		search.addItemListener(this);
+		char comp=0x00a9;
+		String viktormsg=comp+"application designed by Viktor Ivanchenko";
+		Label corp = new Label(viktormsg,Label.CENTER);
+		corp.setFont(new Font(Font.MONOSPACED,Font.PLAIN,11));
+		gbc.gridx=0;gbc.gridy=6;gbc.gridwidth=4;
+		gbag.setConstraints(corp,gbc);
+		this.add(corp);
+	}
+	static Vector<String> getHeaders(){
+		Vector<String> head = new Vector<String>();
+		head.add("Фамилия Имя Отчество");
+		head.add("Номер допуска");
+		head.add("Дата получения");
+		head.add("Действителен до");
+		return head;
 	}
 }
