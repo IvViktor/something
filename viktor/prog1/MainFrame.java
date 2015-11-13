@@ -128,7 +128,7 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 		sort.addItemListener(this);
 		search.addItemListener(this);
 		char comp=0x00a9;
-		String viktormsg=comp+"application designed by Viktor Ivanchenko";
+		String viktormsg=comp+" application designed by Viktor Ivanchenko";
 		Label corp = new Label(viktormsg,Label.CENTER);
 		corp.setFont(new Font(Font.MONOSPACED,Font.PLAIN,11));
 		gbc.gridx=0;gbc.gridy=6;gbc.gridwidth=4;
