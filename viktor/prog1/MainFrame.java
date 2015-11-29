@@ -1,18 +1,25 @@
 package viktor.prog1;
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.table.*;
 import java.awt.event.*;
 import java.util.*;
-import java.io.IOException;
-public class MainFrame extends Frame implements ActionListener,ItemListener{
-	Checkbox sort,search;
-	TextField searchText;
-	Choice chmenu;
-	Panel searchPan;
-	java.util.Vector<Person> list;
-	String fileName=null;
-	ErrorDialog errD;
-	public static void main(String args[]){
+public class MainFrame extends JFrame implements ActionListener{
+	//Checkbox sort,search;
+	JTextField name,sname,fname,num;
+	JComboBox<String> fdateDay,fdateMon,tdateDay,tdateMon;
+	JComboBox fdateYear,tdateYear;
+	java.util.Vector<Person> datalist;
+	TableModel model;
+	String[] days={"01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31"};
+	String[] month={"01","02","03","04","05","06","07","08","09","10","11","12"};
+	int[] years=new int[30];
+	//Choice chmenu;
+	//Panel searchPan;
+	//java.util.Vector<Person> list;
+	//String fileName="testfile.test";
+	//ErrorDialog errD;
+	/*public static void main(String args[]){
 		SwingUtilities.invokeLater(new Runnable(){
 			public void run(){createGUI();}
 		});
@@ -22,10 +29,10 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 		frame.pack();
 		frame.setTitle("Учетник 2015");
 		frame.setVisible(true);
-	}
+	}*/
 	public void actionPerformed(ActionEvent ae){
-		if(ae.getActionCommand().equals("exit")) System.exit(0);
-		if(ae.getActionCommand().equals("browse")){
+		if(ae.getActionCommand().equals("exit")) this.dispose();
+		/*if(ae.getActionCommand().equals("browse")){
 		FileDialog fd = new FileDialog(this,"Выберите файл с информацией",FileDialog.LOAD);
 		fd.setVisible(true);
 	if((fd.getDirectory()!=null)&&(fd.getFile()!=null)){
@@ -35,20 +42,35 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 		} catch (IOException e){
 			String msg="Ошибка чтения файла: "+fileName;
 			errD=new ErrorDialog(this,"Ошибка ввода/вывода",true,msg);}
-		/* catch (IllegalArgumentException e){
+		 catch (IllegalArgumentException e){
 			String msg="Неправильный формат данных в файле: "+fileName;
-			errD=new ErrorDialog(this,"Ошибка чтения данных!!!",true,msg);}*/
+			errD=new ErrorDialog(this,"Ошибка чтения данных!!!",true,msg);}
 		}
-		}
+		}*/
 		if(ae.getActionCommand().equals("start")){
-			if(fileName==null){
+			if((sname.getText().length()>0)&&(num.getText().length()>0)){
+			String fullName=sname.getText()+" "+name.getText()+" "+fname.getText();
+			String from_date=fdateDay.getSelectedItem()+"."+fdateMon.getSelectedItem()+"."+fdateYear.getSelectedItem();
+			String expire=tdateDay.getSelectedItem()+"."+fdateMon.getSelectedItem()+"."+fdateYear.getSelectedItem();
+			Person.addUser(datalist,fullName,num.getText(),from_date,expire);
+			this.dispose();
+			}
+		else new ErrorDialog(this,"Ошыбка",true,"ВНИМАНИЕ! Обязательные поля не заполнены!");
+		}
+/*			if(fileName==null){
 			String msg="Файл не найден, выберите файл с помощью кнопки <Выберите файл>";
 			errD = new ErrorDialog(this,"ОШИБКА!",true,msg);
 			}
 			else{
+		try{
+			list=Person.getPersonsList(fileName);
+		} catch (IOException e){
+			String msg="Ошибка чтения файла: "+fileName;
+			errD=new ErrorDialog(this,"Ошибка ввода/вывода",true,msg);}
+
 			if(sort.getState()){
 				 list=Person.sort(list,chmenu.getSelectedIndex());
-				TableFrame table = new TableFrame("Список с допусками",list,getHeaders());
+				TableFrame table = new TableFrame();//"Список с допусками",list,getHeaders());
 			}
 			else if(search.getState()){
 				String pattern = searchText.getText();
@@ -58,84 +80,100 @@ public class MainFrame extends Frame implements ActionListener,ItemListener{
 				}
 				else{
 			Vector<Person> slist=Person.search(list,pattern,chmenu.getSelectedIndex());
-			TableFrame table = new TableFrame("Список с допусками",slist,getHeaders());
+			TableFrame table = new TableFrame();//"Список с допусками",slist,getHeaders());
 				}
 			}
 			//for(int i=0;i<list.size();i++) System.out.println(list.get(i));
 			}
-		}
+		}*/
 	}
-	public void itemStateChanged(ItemEvent ie){
+	/*public void itemStateChanged(ItemEvent ie){
 		if(sort.getState()) searchPan.setVisible(false);
 		else if(search.getState()) searchPan.setVisible(true);
-	}
-	protected MainFrame(){
-		super();
+	}*/
+	protected MainFrame(Vector<Person> datalist,TableModel model){
+		super("Добавление записи");
+		this.datalist=datalist;
+		this.model=model;
 		addWindowListener(new WindowAdapter(){
-			public void windowClosing(WindowEvent we) {System.exit(0);}
+			public void windowClosing(WindowEvent we){ }//his.dispose();}
 		});
 		GridBagLayout gbag = new GridBagLayout();
 		setLayout(gbag);
 		GridBagConstraints gbc = new GridBagConstraints();
-		Label head = new Label("Начните свою работу:",Label.CENTER);
-		head.setFont(new Font(Font.SERIF,Font.PLAIN,16));
-		gbc.insets= new Insets(5,5,5,5);
-		//gbc.fill=GridBagConstraints.BOTH;
-		//gbc.anchor=GridBagConstraints.PAGE_START;
-		gbc.ipadx=10;
-		gbc.ipady=5;
-		gbc.weightx=0.5;gbc.weighty=0.5;
-		gbc.gridx=1;gbc.gridwidth=3;gbc.gridy=0;
-		gbag.setConstraints(head,gbc);
-		CheckboxGroup grp = new CheckboxGroup();
-		sort = new Checkbox("Сортировка",grp,false);
-		gbc.gridy=1;gbc.gridwidth=1;
-		gbag.setConstraints(sort,gbc);
-		search= new Checkbox("Поиск",grp,true);
-		gbc.gridx=3;
-		gbag.setConstraints(search,gbc);
-		chmenu= new Choice();
-		chmenu.add("по фамилии");chmenu.add("по номеру");
-		chmenu.add("по дате получения");chmenu.add("по дате истечения");
-		chmenu.select(3);
-		gbc.gridx=1;gbc.gridy=3;gbc.gridwidth=3;
-		gbag.setConstraints(chmenu,gbc);
-		Button start = new Button("Начать");
+		gbc.ipadx=10;gbc.ipady=10;
+		gbc.insets=new Insets(5,5,5,5);
+		JLabel snameLab=new JLabel("Фамилия*");
+		gbc.gridx=1;gbc.gridy=1;gbc.gridwidth=1;
+		gbag.setConstraints(snameLab,gbc);
+		sname=new JTextField(30);
+		gbc.gridx=2;gbc.gridwidth=3;
+		gbag.setConstraints(sname,gbc);
+		JLabel nameLab=new JLabel("Имя");
+		gbc.gridx=1;gbc.gridy=2;gbc.gridwidth=1;
+		gbag.setConstraints(nameLab,gbc);
+		name=new JTextField(30);
+		gbc.gridx=2;gbc.gridwidth=3;
+		gbag.setConstraints(name,gbc);
+		JLabel fnameLab=new JLabel("Отчество");
+		gbc.gridx=1;gbc.gridy=3;gbc.gridwidth=1;
+		gbag.setConstraints(fnameLab,gbc);
+		fname=new JTextField(30);
+		gbc.gridx=2;gbc.gridwidth=3;
+		gbag.setConstraints(fname,gbc);
+		JLabel numLab=new JLabel("Номер допуска*");
+		gbc.gridx=1;gbc.gridy=4;gbc.gridwidth=1;
+		gbag.setConstraints(numLab,gbc);
+		num=new JTextField(10);
+		gbc.gridx=2;gbag.setConstraints(num,gbc);
+		JLabel fdateLab=new JLabel("Дата получения*");
+		gbc.gridx=1;gbc.gridy=5;gbag.setConstraints(fdateLab,gbc);
+		for(int i=0;i<years.length;i++) years[i]=2005+i;
+		fdateDay=new JComboBox<String>();
+		for(int i=0;i<days.length;i++) fdateDay.addItem(days[i]);
+		fdateDay.setSelectedIndex(0);
+		gbc.gridx=2;gbag.setConstraints(fdateDay,gbc);
+		fdateMon=new JComboBox<String>();
+		for(int i=0;i<month.length;i++) fdateMon.addItem(month[i]);
+		fdateMon.setSelectedIndex(0);
+		gbc.gridx=3;gbag.setConstraints(fdateMon,gbc);
+		fdateYear=new JComboBox();
+		for(int i=0;i<years.length;i++) fdateYear.addItem(years[i]);
+		fdateYear.setSelectedIndex(10);
+		gbc.gridx=4;gbag.setConstraints(fdateYear,gbc);
+		JLabel tdateLab=new JLabel("Дата истечения*");
+		gbc.gridx=1;gbc.gridy=6;gbag.setConstraints(tdateLab,gbc);
+		tdateDay=new JComboBox<String>();
+		for(int i=0;i<days.length;i++) tdateDay.addItem(days[i]);
+		tdateDay.setSelectedIndex(0);
+		gbc.gridx=2;gbag.setConstraints(tdateDay,gbc);
+		tdateMon=new JComboBox<String>();
+		for(int i=0;i<month.length;i++) tdateMon.addItem(month[i]);
+		tdateMon.setSelectedIndex(0);
+		gbc.gridx=3;gbag.setConstraints(tdateMon,gbc);
+		tdateYear=new JComboBox();
+		for(int i=0;i<years.length;i++) tdateYear.addItem(years[i]);
+		tdateYear.setSelectedIndex(10);
+		gbc.gridx=4;gbag.setConstraints(tdateYear,gbc);
+		JButton start = new JButton("OK");
 		start.setActionCommand("start");
-		gbc.gridx=0;gbc.gridy=5;gbc.gridwidth=1;
+		gbc.gridx=2;gbc.gridy=7;gbc.gridwidth=1;
 		gbag.setConstraints(start,gbc);
-		Button selectFile= new Button("Выбрать файл");
-		selectFile.setActionCommand("browse");
-		gbc.gridx=1;gbc.gridy=5;gbc.gridwidth=1;
-		gbag.setConstraints(selectFile,gbc);
-		Button close = new Button("Закрыть");
+		JButton close = new JButton("Отмена");
 		close.setActionCommand("exit");
-		gbc.gridx=4;
+		gbc.gridx=3;
 		gbag.setConstraints(close,gbc);
-		this.add(head);this.add(sort);this.add(search);this.add(chmenu);this.add(start);
-		this.add(close);this.add(selectFile);
+		this.add(start);this.add(close);this.add(fnameLab);this.add(fname);this.add(nameLab);
+		this.add(name);this.add(snameLab);this.add(sname);this.add(numLab);this.add(num);
+		this.add(fdateLab);this.add(fdateDay);this.add(fdateMon);this.add(fdateYear);
+		this.add(tdateLab);this.add(tdateDay);this.add(tdateMon);this.add(tdateYear);
 		close.addActionListener(this);
 		start.addActionListener(this);
-		selectFile.addActionListener(this);
-		searchPan = new Panel();
-		Label searchLab= new Label("Поиск:",Label.CENTER);
-		searchPan.add(searchLab);
-		searchText = new TextField(25);
-		searchPan.add(searchText);
-		gbc.gridx=0;gbc.gridy=2;gbc.gridwidth=4;
-		gbag.setConstraints(searchPan,gbc);
-		this.add(searchPan);
-		sort.addItemListener(this);
-		search.addItemListener(this);
-		char comp=0x00a9;
-		String viktormsg=comp+" application designed by Viktor Ivanchenko";
-		Label corp = new Label(viktormsg,Label.CENTER);
-		corp.setFont(new Font(Font.MONOSPACED,Font.PLAIN,11));
-		gbc.gridx=0;gbc.gridy=6;gbc.gridwidth=4;
-		gbag.setConstraints(corp,gbc);
-		this.add(corp);
+		this.pack();
+		this.setVisible(true);
+		
 	}
-	static Vector<String> getHeaders(){
+	protected static Vector<String> getHeaders(){
 		Vector<String> head = new Vector<String>();
 		head.add("Фамилия Имя Отчество");
 		head.add("Номер допуска");
