@@ -4,7 +4,7 @@ import viktor.prog4.api.LineItem;
 
 
 public class TableText implements LineItem{
-	private final String name="table_text";
+	protected static final String name="table_text";
 	private String value,id;
 
 	public TableText(String value,String id){

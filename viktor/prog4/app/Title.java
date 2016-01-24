@@ -4,7 +4,7 @@ import viktor.prog4.api.LineItem;
 
 
 public class Title implements LineItem{
-	private final String name="title";
+	protected static final String name="title";
 	private String value,id;
 
 	public Title(String value,String id){

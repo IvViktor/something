@@ -4,7 +4,7 @@ import viktor.prog4.api.LineItem;
 
 
 public class Sentence implements LineItem{
-	private final String name="sentence";
+	protected static final String name="sentence";
 	private String value,id;
 	private boolean inner;
 	

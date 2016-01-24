@@ -4,7 +4,7 @@ import viktor.prog4.api.LineItem;
 
 
 public class BulletPoint implements LineItem{
-	private final String name="point";
+	protected static final String name="point";
 	private String id;
 
 	public BulletPoint(String id){

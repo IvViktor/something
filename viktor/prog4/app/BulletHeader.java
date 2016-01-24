@@ -4,7 +4,7 @@ import viktor.prog4.api.LineItem;
 
 
 public class BulletHeader implements LineItem{
-	private final String name="header";
+	protected static final String name="header";
 	private String value,id;
 
 	public BulletHeader(String val,String id){
