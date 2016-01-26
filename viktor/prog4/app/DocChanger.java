@@ -56,9 +56,7 @@ public class DocChanger{
 				    	 org.docx4j.wml.Tc tC=(org.docx4j.wml.Tc)((JAXBElement)o1).getValue();
 							for(Object o2 : tC.getContent()){
 								if(o2 instanceof org.docx4j.wml.P){
-		   					org.docx4j.wml.ParaRPr parRProp=((org.docx4j.wml.P) o2).getPPr().getRPr();
-									parRProp.setSz(fontSize);
-									parRProp.setSzCs(fontSize);
+										setParagraphFontSize((org.docx4j.wml.P) o2);
 								}
 							}
 						}
@@ -77,8 +75,7 @@ public class DocChanger{
 				    	 org.docx4j.wml.Tc tC=(org.docx4j.wml.Tc)((JAXBElement)o1).getValue();
 							for(Object o2 : tC.getContent()){
 								if(o2 instanceof org.docx4j.wml.P){
-		   					org.docx4j.wml.ParaRPr parRProp=((org.docx4j.wml.P) o2).getPPr().getRPr();
-									parRProp.setColor(fontColor);
+										setParagraphFontColor((org.docx4j.wml.P) o2);
 								}
 							}
 						}
@@ -93,11 +90,24 @@ public class DocChanger{
 			org.docx4j.wml.ParaRPr parRProp=par.getPPr().getRPr();
 			parRProp.setSz(fontSize);
 			parRProp.setSzCs(fontSize);
+			for(Object o : par.getContent()){
+				if(o instanceof org.docx4j.wml.R){
+					org.docx4j.wml.R run = (R) o;
+					run.getRPr().setSz(fontSize);
+					run.getRPr().setSzCs(fontSize);
+				}
+			}
 	}
 	
 	public void setParagraphFontColor(org.docx4j.wml.P par){
 			org.docx4j.wml.ParaRPr parRProp=par.getPPr().getRPr();
 			parRProp.setColor(fontColor);
+			for(Object o : par.getContent()){
+				if(o instanceof org.docx4j.wml.R){
+					org.docx4j.wml.R run = (R) o;
+					run.getRPr().setColor(fontColor);
+				}
+			}
 	}
 
 	public org.docx4j.wml.R getRun(org.docx4j.wml.P par,String text){
@@ -133,4 +143,19 @@ public class DocChanger{
 			}
 			return null;
 	}
+
+	public void setBulletFontSize(List<Integer> indexList){
+		for(Integer index : indexList){
+			org.docx4j.wml.P par=getParagraph(index);
+			setParagraphFontSize(par);
+		}
+	}
+
+	public void setBulletFontColor(List<Integer> indexList){
+		for(Integer index : indexList){
+			org.docx4j.wml.P par=getParagraph(index);
+			setParagraphFontColor(par);
+		}
+	}
+
 }

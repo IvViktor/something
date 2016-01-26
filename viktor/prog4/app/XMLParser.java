@@ -27,15 +27,13 @@ public class XMLParser{
 			return new LinkedList<Element>();
 	}
 
-	public String getNodeValue(List<Element> list, String id) throws IllegalArgumentException{
+	public Element getNodeValue(List<Element> list, String id) throws IllegalArgumentException{
 		List<Element> subList=new LinkedList<>();
 		for(Element element : list){
 			if(element.getName().equals(Bullet.name)) subList.add(element);
 			if(element.getName().equals(BulletPoint.name)) subList.add(element);
 			if(element.getAttributeValue("id").equals(id)){
-				String text=element.getText();
-				if(text.length()>0) return text;
-				else return null;
+					return element;
 			}
 		}
 		for(Element subEl : subList){
@@ -44,6 +42,29 @@ public class XMLParser{
 			}catch (IllegalArgumentException e){ continue;}
 		}
 		throw new IllegalArgumentException("No such ID in current xml file. Please try another.");
+	}
+	
+	public String getElementText(Element element){
+			return element.getText();
+	}
+
+	public List<Integer> getBulletIndexes(Element element){
+		List<Integer> intList=new LinkedList<>();	
+		for(Element el : element.getChildren()){
+			if(el.getName().equals(BulletPoint.name)){
+				for(Element el1 : el.getChildren()){
+					intList.add(getElementIndex(el1));
+				}
+			}
+			else intList.add(getElementIndex(el));
+		}
+		return intList;
+	}
+
+	private Integer getElementIndex(Element element){
+			String preId=element.getAttributeValue("id");
+			String[] idSplit=preId.split("\\.");
+			return new Integer(Integer.parseInt(idSplit[0]));
 	}
 
 }	

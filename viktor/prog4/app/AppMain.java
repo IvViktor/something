@@ -61,12 +61,13 @@ public class AppMain{
 		if(xmlParse){
 			XMLParser xmlparser=new XMLParser();	
 			List<Element> elementList=xmlparser.readXMLFile(xmlFile);
-			String value=xmlparser.getNodeValue(elementList,id);
+			Element element=xmlparser.getNodeValue(elementList,id);
+			String value=xmlparser.getElementText(element);
 			String[] idSplit=id.split("\\.");
 			String fNum=idSplit[0];
 			String type=idSplit[idSplit.length-1];
 			DocChanger dc=new DocChanger(contentList,fontSize*2,fontColor);
-			if(type.equals("T")){
+			if((type.equals("T"))||(type.equals("BH"))){
 				org.docx4j.wml.P par=dc.getParagraph(Integer.parseInt(fNum));
 				dc.setParagraphFontSize(par);
 				dc.setParagraphFontColor(par);
@@ -75,6 +76,11 @@ public class AppMain{
 				org.docx4j.wml.Tbl table=dc.getTable(Integer.parseInt(fNum));
 				dc.setTableFontSize(table);
 				dc.setTableFontColor(table);
+			}
+			else if((type.equals("BB"))||(type.equals("BP"))){
+					List<Integer> intList=xmlparser.getBulletIndexes(element);
+					dc.setBulletFontSize(intList);
+					dc.setBulletFontColor(intList);
 			}
 			else{
 				org.docx4j.wml.P par=dc.getParagraph(Integer.parseInt(fNum));
